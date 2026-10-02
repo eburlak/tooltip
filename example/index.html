@@ -3,170 +3,828 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Tooltip demo</title>
+    <title>@eburlak/tooltip - one tooltip that glides between anchors</title>
+    <meta
+      name="description"
+      content="Accessible, zero-dependency tooltip for React and vanilla JS. One shared element glides between anchors, data-tooltip attributes, runtime themes, about 2.3 kB gzipped."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@eburlak/tooltip" />
+    <meta property="og:description" content="One tooltip that glides between every anchor. Accessible, zero dependencies, React and plain HTML." />
+    <meta property="og:url" content="https://eburlak.github.io/tooltip/" />
+    <meta property="og:image" content="https://eburlak.github.io/tooltip/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='4' width='28' height='18' rx='6' fill='%231d1b2e'/%3E%3Cpath d='M12 22h8l-4 6z' fill='%231d1b2e'/%3E%3C/svg%3E" />
+    <link rel="canonical" href="https://eburlak.github.io/tooltip/" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
     <style>
-      :root { color-scheme: light; }
+      :root {
+        --page: #e7e6ef;
+        --cap: #f8f8fc;
+        --cap-edge: #c8c5da;
+        --cap-shadow: #aeaac6;
+        --ink: #1d1b2e;
+        --muted: #5f5c77;
+        --cobalt: #2747e8;
+        --code: #1d1b2e;
+        --code-text: #e9e7f7;
+        --display: 'Bricolage Grotesque', system-ui, sans-serif;
+        --mono: 'JetBrains Mono', ui-monospace, monospace;
+        color-scheme: light;
+      }
 
-      * { box-sizing: border-box; }
-      body { margin: 0; padding: 0 24px 120px; font: 14px/1.5 system-ui, sans-serif; color: #1f2329; background: #f6f7f9; }
-      h1 { margin: 0; padding: 24px 0 4px; font-size: 22px; }
-      h2 { margin: 0 0 4px; font-size: 15px; }
-      p { margin: 0 0 12px; color: #5c6370; }
-      code { font: 12px ui-monospace, monospace; background: #eceef2; padding: 1px 4px; border-radius: 4px; }
+      * {
+        box-sizing: border-box;
+      }
 
-      section { margin-top: 16px; padding: 16px; background: #fff; border: 1px solid #e3e6eb; border-radius: 10px; }
-      .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-      .row.spread { justify-content: space-between; }
+      body {
+        margin: 0;
+        background: var(--page);
+        color: var(--ink);
+        font: 17px/1.55 var(--display);
+        -webkit-font-smoothing: antialiased;
+      }
 
-      button { padding: 8px 14px; font: inherit; border: 1px solid #c9ced6; border-radius: 6px; background: #fff; cursor: pointer; }
-      button:hover { background: #f0f2f5; }
-      button:focus-visible { outline: 2px solid #3b5bdb; outline-offset: 2px; }
+      a {
+        color: var(--cobalt);
+        text-underline-offset: 3px;
+      }
 
-      .top-edge { position: fixed; top: 4px; right: 24px; }
-      .bottom-edge { position: fixed; bottom: 4px; right: 24px; }
+      :focus-visible {
+        outline: 2px solid var(--cobalt);
+        outline-offset: 3px;
+      }
 
-      .scroller { height: 120px; overflow: auto; padding: 12px; border: 1px dashed #c9ced6; border-radius: 6px; }
-      .scroller > div { height: 360px; display: flex; flex-direction: column; align-items: flex-start; gap: 60px; }
+      .page {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
 
-      #status { color: #5c6370; }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 22px 0;
+        font-size: 15px;
+      }
+
+      .top strong {
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+
+      .top nav {
+        display: flex;
+        gap: 20px;
+      }
+
+      .top nav a {
+        color: var(--ink);
+        text-decoration: none;
+      }
+
+      .top nav a:hover {
+        text-decoration: underline;
+      }
+
+      .hero {
+        padding: 48px 0 0;
+      }
+
+      h1 {
+        max-width: 13ch;
+        margin: 0;
+        font-size: clamp(44px, 7vw, 84px);
+        font-weight: 800;
+        line-height: 0.95;
+        letter-spacing: -0.035em;
+        font-variation-settings: 'opsz' 96;
+      }
+
+      .lead {
+        max-width: 52ch;
+        margin: 24px 0 0;
+        color: var(--muted);
+        font-size: 19px;
+      }
+
+      .keyboard {
+        position: relative;
+        margin: 44px 0 0;
+        padding: clamp(8px, 1.6vw, 18px);
+        border-radius: 22px;
+        background: linear-gradient(#d9d7e6, #cfcce0);
+        box-shadow:
+          inset 0 1px 0 #f1f0f8,
+          0 30px 60px -30px #6f6a9a;
+        touch-action: manipulation;
+      }
+
+      .row {
+        display: flex;
+        gap: clamp(3px, 0.6vw, 7px);
+      }
+
+      .row + .row {
+        margin-top: clamp(3px, 0.6vw, 7px);
+      }
+
+      .key {
+        flex: var(--units, 1) 0 0;
+        min-width: 0;
+        height: clamp(30px, 5vw, 54px);
+        padding: 0 0 0 clamp(4px, 0.8vw, 10px);
+        border: 1px solid var(--cap-edge);
+        border-radius: clamp(5px, 0.8vw, 10px);
+        background: var(--cap);
+        box-shadow: 0 clamp(2px, 0.4vw, 4px) 0 var(--cap-shadow);
+        color: var(--ink);
+        font: 500 clamp(9px, 1.35vw, 15px) / 1 var(--mono);
+        text-align: left;
+        cursor: pointer;
+        transition:
+          transform 90ms ease-out,
+          box-shadow 90ms ease-out,
+          background-color 160ms;
+      }
+
+      .key:hover {
+        background: #fff;
+      }
+
+      .key.is-pressed,
+      .key:active {
+        transform: translateY(clamp(2px, 0.4vw, 4px));
+        box-shadow: 0 0 0 var(--cap-shadow);
+        background: #fff;
+      }
+
+      .key.is-lit {
+        background: var(--ink);
+        border-color: var(--ink);
+        color: #fff;
+      }
+
+      .proof {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 8px 24px;
+        margin: 18px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      .proof output {
+        color: var(--ink);
+        font-family: var(--mono);
+        font-size: 14px;
+      }
+
+      .ghost {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        width: 26px;
+        pointer-events: none;
+        opacity: 0;
+        filter: drop-shadow(0 3px 4px rgb(29 27 46 / 0.35));
+        transition:
+          transform 420ms cubic-bezier(0.3, 0, 0, 1),
+          opacity 300ms;
+      }
+
+      .ghost.is-visible {
+        opacity: 1;
+      }
+
+      .ghost.is-clicking svg {
+        transform: scale(0.86);
+      }
+
+      .ghost svg {
+        display: block;
+        transform-origin: 3px 3px;
+        transition: transform 90ms;
+      }
+
+      section {
+        display: grid;
+        grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+        gap: 48px;
+        align-items: start;
+        padding: 112px 0 0;
+      }
+
+      h2 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 44px);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.025em;
+      }
+
+      section p {
+        max-width: 46ch;
+        margin: 16px 0 0;
+        color: var(--muted);
+      }
+
+      .stage {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 0 0 16px;
+      }
+
+      .button {
+        padding: 12px 18px;
+        border: 1px solid var(--cap-edge);
+        border-radius: 12px;
+        background: var(--cap);
+        box-shadow: 0 3px 0 var(--cap-shadow);
+        color: var(--ink);
+        font: 500 16px/1 var(--display);
+        cursor: pointer;
+      }
+
+      .button:active {
+        transform: translateY(3px);
+        box-shadow: none;
+      }
+
+      pre {
+        margin: 0;
+        padding: 22px 24px;
+        overflow-x: auto;
+        border-radius: 16px;
+        background: var(--code);
+        color: var(--code-text);
+        font: 14px/1.7 var(--mono);
+      }
+
+      .token-tag {
+        color: #9fb0ff;
+      }
+
+      .token-attr {
+        color: #ffd479;
+      }
+
+      .token-string {
+        color: #8fe3b8;
+      }
+
+      .token-dim {
+        color: #8d89a8;
+      }
+
+      .swatches {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin: 0 0 16px;
+      }
+
+      .swatch {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 16px 10px 10px;
+        border: 1px solid var(--cap-edge);
+        border-radius: 999px;
+        background: var(--cap);
+        color: var(--ink);
+        font: 500 16px/1 var(--display);
+        cursor: pointer;
+      }
+
+      .swatch::before {
+        content: '';
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--sample);
+        box-shadow: inset 0 0 0 1px rgb(29 27 46 / 0.15);
+      }
+
+      .swatch[aria-pressed='true'] {
+        border-color: var(--ink);
+        box-shadow: inset 0 0 0 1px var(--ink);
+      }
+
+      .install {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        width: fit-content;
+        max-width: 100%;
+        margin: 28px 0 0;
+        padding: 8px 8px 8px 20px;
+        border-radius: 14px;
+        background: var(--code);
+        color: var(--code-text);
+        font: 15px/1 var(--mono);
+      }
+
+      .install code {
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .install button {
+        flex: none;
+        padding: 10px 14px;
+        border: 0;
+        border-radius: 9px;
+        background: #3a3753;
+        color: #fff;
+        font: 500 14px/1 var(--display);
+        cursor: pointer;
+      }
+
+      .install button:hover {
+        background: #4a4668;
+      }
+
+      footer {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 128px 0 0;
+        padding: 28px 0 40px;
+        border-top: 1px solid var(--cap-edge);
+        color: var(--muted);
+        font-size: 15px;
+      }
+
+      footer nav {
+        display: flex;
+        gap: 20px;
+      }
+
+      @media (max-width: 760px) {
+        .hero {
+          padding-top: 24px;
+        }
+
+        .keyboard {
+          margin-top: 40px;
+        }
+
+        section {
+          grid-template-columns: minmax(0, 1fr);
+          gap: 28px;
+          padding-top: 80px;
+        }
+
+        .top nav a:first-child {
+          display: none;
+        }
+
+        .page {
+          padding: 0 16px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .key,
+        .ghost,
+        .ghost svg {
+          transition: none;
+        }
+      }
     </style>
   </head>
   <body>
-    <button class="top-edge" data-tooltip="Asked for top, flipped to bottom">Near top edge</button>
-    <button class="bottom-edge" data-tooltip="Asked for bottom, flipped to top" data-tooltip-placement="bottom">Near bottom edge</button>
+    <div class="page">
+      <header class="top">
+        <strong>@eburlak/tooltip</strong>
+        <nav>
+          <a href="#markup" data-tooltip="Jump to the code">Docs</a>
+          <a href="https://github.com/eburlak/tooltip" data-tooltip="Source, issues, stars">GitHub</a>
+          <a href="https://www.npmjs.com/package/@eburlak/tooltip" data-tooltip="Install from npm" data-tooltip-placement="bottom">npm</a>
+        </nav>
+      </header>
 
-    <h1>Tooltip demo</h1>
-    <p>One shared element for every anchor, its id is random per instance. Hover, focus with Tab, press Escape.</p>
+      <main>
+        <div class="hero">
+          <h1>One tooltip. It travels.</h1>
+          <p class="lead">
+            Every anchor on this page shares a single element. It glides to the next one and morphs its size
+            and text on the way. Hover the keyboard, press Tab, or just start typing.
+          </p>
 
-    <section>
-      <h2>Placement</h2>
-      <p>
-        Markup only: <code>data-tooltip</code> and <code>data-tooltip-placement</code>, <code>top</code> by default.
-        One <code>listen()</code> call serves every anchor, including ones added later.
-      </p>
-      <div class="row">
-        <button id="top" data-tooltip="Shown above">Top</button>
-        <button id="bottom" data-tooltip="Shown below" data-tooltip-placement="bottom">Bottom</button>
-        <button id="add">Add a button</button>
-      </div>
-    </section>
+          <div class="keyboard" id="keyboard" aria-label="Shortcut keyboard">
+            <div class="ghost" id="ghost" aria-hidden="true">
+              <svg viewBox="0 0 26 32" width="26" height="32">
+                <path d="M3 2 L3 26 L9 20.5 L13.2 30 L17.4 28.2 L13.3 19 L21.5 19 Z" fill="#fff" stroke="#1d1b2e" stroke-width="2" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
 
-    <section>
-      <h2>Auto flip</h2>
-      <p>The fixed buttons in the top and bottom right corners ask for the side that does not fit and get the opposite one.</p>
-    </section>
+          <div class="proof">
+            <span>Tooltip elements in the page right now: <output id="count">0</output></span>
+            <span>About 2.3 kB gzipped, zero dependencies</span>
+          </div>
 
-    <section>
-      <h2>Viewport clamp</h2>
-      <p>Long text at the edges stays inside the viewport horizontally.</p>
-      <div class="row spread">
-        <button id="left-edge" data-tooltip="A fairly long tooltip that would overflow the left edge of the viewport">Left edge</button>
-        <button id="right-edge" data-tooltip="A fairly long tooltip that would overflow the right edge of the viewport">Right edge</button>
-      </div>
-    </section>
-
-    <section>
-      <h2>Multiline</h2>
-      <p>Line breaks are kept (<code>white-space: pre-line</code>), long words wrap by <code>theme.maxWidth</code>.</p>
-      <div class="row">
-        <button id="multiline" data-tooltip="Ctrl+S - save&#10;Ctrl+Z - undo&#10;Esc - close">Shortcuts</button>
-        <button id="long" data-tooltip="Supercalifragilisticexpialidocious_without_any_spaces_at_all wraps too">Long text</button>
-      </div>
-    </section>
-
-    <section>
-      <h2>Hides on scroll</h2>
-      <p>Any scroll, including nested containers, hides the tooltip.</p>
-      <div class="scroller">
-        <div>
-          <button data-tooltip="Scroll the box - I will hide">Inside scroller</button>
-          <button data-tooltip="Still the same element">Further down</button>
+          <div class="install">
+            <code>npm install @eburlak/tooltip</code>
+            <button type="button" id="copy-install" data-tooltip="Copy the command">Copy</button>
+          </div>
         </div>
-      </div>
-    </section>
 
-    <section>
-      <h2>Manual control and theming</h2>
-      <p>
-        <code>show(anchor, text)</code> / <code>hide()</code>, <code>configure({ offset })</code>,
-        <code>destroy()</code> and <code>configure({ theme })</code>, which regenerates the styles.
-        Copy changes its <code>data-tooltip</code> on click - the open tooltip follows it.
-      </p>
-      <div class="row">
-        <button id="copy" data-tooltip="Copy to clipboard">Copy</button>
-        <button id="manual">Show for 2 s</button>
-        <button id="offset" data-tooltip="Click to change the gap">Offset: 8</button>
-        <button id="theme" data-tooltip="Click - the theme is applied right away, styles are regenerated">Toggle accent theme</button>
-        <button id="destroy" data-tooltip="Removes markup and styles, the next show mounts them again">Destroy</button>
-        <span id="status"></span>
-      </div>
-    </section>
+        <section id="markup">
+          <div>
+            <h2>Markup is the whole API</h2>
+            <p>
+              Put the text in <code>data-tooltip</code> and call <code>listen()</code> once. Elements added later
+              work too, and the open tooltip follows when the attribute changes - press Copy and watch.
+            </p>
+          </div>
+          <div>
+            <div class="stage">
+              <button class="button" type="button" id="copy-demo" data-tooltip="Copy link">Copy</button>
+              <button class="button" type="button" data-tooltip="Opens below" data-tooltip-placement="bottom">Below</button>
+              <button class="button" type="button" data-tooltip="Line breaks are kept&#10;Long words wrap by maxWidth">Multiline</button>
+              <button class="button" type="button" id="add-anchor">Add a button</button>
+            </div>
+            <pre><code><span class="token-tag">&lt;button</span> <span class="token-attr">data-tooltip</span>=<span class="token-string">"Copy link"</span><span class="token-tag">&gt;</span>Copy<span class="token-tag">&lt;/button&gt;</span>
+<span class="token-tag">&lt;button</span> <span class="token-attr">data-tooltip</span>=<span class="token-string">"Opens below"</span>
+        <span class="token-attr">data-tooltip-placement</span>=<span class="token-string">"bottom"</span><span class="token-tag">&gt;</span>Below<span class="token-tag">&lt;/button&gt;</span>
+
+<span class="token-tag">import</span> { Tooltip } <span class="token-tag">from</span> <span class="token-string">'@eburlak/tooltip'</span>;
+
+<span class="token-tag">new</span> Tooltip().listen(); <span class="token-dim">// every [data-tooltip], now and later</span></code></pre>
+          </div>
+        </section>
+
+        <section id="themes">
+          <div>
+            <h2>Restyle it while it is open</h2>
+            <p>
+              A theme is a plain object. <code>configure()</code> regenerates the styles, and an open tooltip
+              animates into the new colors, radius and font instead of blinking.
+            </p>
+          </div>
+          <div>
+            <div class="swatches" id="swatches"></div>
+            <pre><code id="theme-code"></code></pre>
+          </div>
+        </section>
+
+        <section id="react">
+          <div>
+            <h2>Same in React</h2>
+            <p>
+              The attributes work in JSX after one <code>listen()</code> at startup, and a re-render that changes the
+              text updates the open tooltip. No provider, no portal, no wrapper component.
+            </p>
+          </div>
+          <pre><code><span class="token-dim">// tooltip.ts</span>
+<span class="token-tag">export const</span> tooltip = <span class="token-tag">new</span> Tooltip({ theme: { maxWidth: <span class="token-string">240</span> } });
+tooltip.listen();
+
+<span class="token-dim">// CopyButton.tsx</span>
+<span class="token-tag">&lt;button</span> <span class="token-attr">data-tooltip</span>={isCopied ? <span class="token-string">'Copied!'</span> : <span class="token-string">'Copy'</span>}<span class="token-tag">&gt;</span>
+  Copy
+<span class="token-tag">&lt;/button&gt;</span></code></pre>
+        </section>
+      </main>
+
+      <footer>
+        <span>MIT licensed, made by Evgeniy Burlak</span>
+        <nav>
+          <a href="https://github.com/eburlak/tooltip#readme" data-tooltip="Full API and theme reference">Docs</a>
+          <a href="https://github.com/eburlak/tooltip" data-tooltip="Source on GitHub">GitHub</a>
+          <a href="https://www.npmjs.com/package/@eburlak/tooltip" data-tooltip="Package on npm">npm</a>
+        </nav>
+      </footer>
+    </div>
 
     <script src="../dist/index.global.js"></script>
     <script>
-      const THEMES = {
-        dark: { background: '#1f2329', color: '#fff', maxWidth: 280 },
-        accent: { background: '#3b5bdb', color: '#fff', maxWidth: 180 },
-      };
+      const KEYS = [
+        [
+          ['Escape', 'Esc', 'Esc - close the tooltip'],
+          ['Digit1', '1', '⌘1 - first tab'],
+          ['Digit2', '2', '⌘2 - second tab'],
+          ['Digit3', '3', '⌘3 - third tab'],
+          ['Digit4', '4', '⌘4 - fourth tab'],
+          ['Digit5', '5', '⌘5 - fifth tab'],
+          ['Digit6', '6', '⌘6 - sixth tab'],
+          ['Digit7', '7', '⌘7 - seventh tab'],
+          ['Digit8', '8', '⌘8 - eighth tab'],
+          ['Digit9', '9', '⌘9 - last tab'],
+          ['Digit0', '0', '⌘0 - reset zoom'],
+          ['Minus', '-', '⌘- - zoom out'],
+          ['Equal', '=', '⌘= - zoom in'],
+          ['Backspace', 'Delete', '⌫ - delete backward', 2],
+        ],
+        [
+          ['Tab', 'Tab', 'Tab - next field, and the tooltip follows focus', 1.5],
+          ['KeyQ', 'Q', '⌘Q - quit'],
+          ['KeyW', 'W', '⌘W - close tab'],
+          ['KeyE', 'E', '⌘E - use selection for find'],
+          ['KeyR', 'R', '⌘R - reload'],
+          ['KeyT', 'T', '⌘T - new tab'],
+          ['KeyY', 'Y', '⌘Y - redo'],
+          ['KeyU', 'U', '⌘U - underline'],
+          ['KeyI', 'I', '⌘I - italic'],
+          ['KeyO', 'O', '⌘O - open'],
+          ['KeyP', 'P', '⌘P - print'],
+          ['BracketLeft', '[', '⌘[ - outdent'],
+          ['BracketRight', ']', '⌘] - indent'],
+          ['Backslash', '\\', '⌘\\ - toggle sidebar', 1.5],
+        ],
+        [
+          ['CapsLock', 'Caps', 'Caps Lock - nobody has pressed it on purpose since 1998', 1.75],
+          ['KeyA', 'A', '⌘A - select all'],
+          ['KeyS', 'S', '⌘S - save'],
+          ['KeyD', 'D', '⌘D - duplicate'],
+          ['KeyF', 'F', '⌘F - find'],
+          ['KeyG', 'G', '⌘G - find next'],
+          ['KeyH', 'H', '⌘H - hide window'],
+          ['KeyJ', 'J', '⌘J - jump to line'],
+          ['KeyK', 'K', '⌘K - insert link'],
+          ['KeyL', 'L', '⌘L - select line'],
+          ['Semicolon', ';', '⌘; - next misspelling'],
+          ['Quote', "'", "⌘' - toggle quote"],
+          ['Enter', 'Return', 'Return - confirm\n⇧Return - new line without sending', 2.25],
+        ],
+        [
+          ['ShiftLeft', 'Shift', 'Shift - hold for the other half of the keyboard', 2.25],
+          ['KeyZ', 'Z', '⌘Z - undo'],
+          ['KeyX', 'X', '⌘X - cut'],
+          ['KeyC', 'C', '⌘C - copy'],
+          ['KeyV', 'V', '⌘V - paste'],
+          ['KeyB', 'B', '⌘B - bold'],
+          ['KeyN', 'N', '⌘N - new window'],
+          ['KeyM', 'M', '⌘M - minimize'],
+          ['Comma', ',', '⌘, - settings'],
+          ['Period', '.', '⌘. - cancel'],
+          ['Slash', '/', '⌘/ - toggle comment'],
+          ['ShiftRight', 'Shift', 'Shift - the right one, rarely seen in the wild', 2.75],
+        ],
+        [
+          ['ControlLeft', 'Ctrl', 'Control - the other modifier', 1.5],
+          ['AltLeft', 'Opt', 'Option - type ©, ™ and friends', 1.5],
+          ['MetaLeft', '⌘', 'Command - every tooltip on this keyboard starts here', 1.75],
+          ['Space', '', 'Space - the widest key, the same single tooltip', 6.5],
+          ['MetaRight', '⌘', 'Command - the right one', 1.75],
+          ['AltRight', 'Opt', 'Option - the right one', 2],
+        ],
+      ];
 
-      const tooltip = new Tooltip({ theme: THEMES.dark });
+      const THEMES = [
+        { name: 'Ink', theme: { background: '#1d1b2e', color: '#ffffff', radius: 6, font: "13px/1.4 'Bricolage Grotesque'" } },
+        { name: 'Cobalt', theme: { background: '#2747e8', color: '#ffffff', radius: 12, font: "14px/1.4 'Bricolage Grotesque'" } },
+        { name: 'Signal', theme: { background: '#ffd43b', color: '#1d1b2e', radius: 2, font: "600 13px/1.4 'JetBrains Mono'" } },
+        { name: 'Moss', theme: { background: '#1f5c45', color: '#e6f5ec', radius: 18, font: 'italic 14px/1.4 Georgia, serif' } },
+      ];
 
-      const byId = (id) => document.getElementById(id);
-      const status = byId('status');
-      const updateStatus = () => {
-        status.textContent = document.getElementById(tooltip.id) ? `#${tooltip.id} is mounted` : `#${tooltip.id} is removed`;
-      };
+      const TYPED_WORD = 'TOOLTIP';
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
+      const tooltip = new Tooltip({ theme: { ...THEMES[0].theme, duration: 240 } });
       tooltip.listen();
 
-      let addedCount = 0;
-      byId('add').addEventListener('click', (event) => {
+      const byId = (id) => document.getElementById(id);
+      const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+
+      const keyboard = byId('keyboard');
+      const keysByCode = new Map();
+
+      KEYS.forEach((row) => {
+        const rowElement = document.createElement('div');
+        rowElement.className = 'row';
+
+        row.forEach(([code, label, text, units]) => {
+          const key = document.createElement('button');
+          key.type = 'button';
+          key.className = 'key';
+          key.textContent = label;
+          key.dataset.tooltip = text;
+          key.setAttribute('aria-label', text.split('\n')[0]);
+
+          if (units) {
+            key.style.setProperty('--units', units);
+          }
+
+          keysByCode.set(code, key);
+          rowElement.append(key);
+        });
+
+        keyboard.append(rowElement);
+      });
+
+      const press = (key) => {
+        key.classList.add('is-pressed');
+        setTimeout(() => key.classList.remove('is-pressed'), 140);
+      };
+
+      keyboard.addEventListener('pointerdown', (event) => {
+        const key = event.target.closest('.key');
+
+        if (key && event.pointerType !== 'mouse') {
+          tooltip.show(key, key.dataset.tooltip);
+        }
+      });
+
+      const ghostState = { isRunning: false, isCancelled: false };
+      const ghost = byId('ghost');
+
+      const cancelGhost = () => {
+        ghostState.isCancelled = true;
+        ghost.classList.remove('is-visible');
+        keyboard.querySelectorAll('.is-lit').forEach((key) => key.classList.remove('is-lit'));
+      };
+
+      const moveGhostTo = (key) => {
+        const keyboardRect = keyboard.getBoundingClientRect();
+        const keyRect = key.getBoundingClientRect();
+        const left = keyRect.left - keyboardRect.left + keyRect.width * 0.55;
+        const top = keyRect.top - keyboardRect.top + keyRect.height * 0.5;
+        ghost.style.transform = `translate(${left}px, ${top}px)`;
+      };
+
+      const playGhost = async () => {
+        if (reducedMotion.matches || ghostState.isRunning) {
+          return;
+        }
+
+        ghostState.isRunning = true;
+        const typed = [...TYPED_WORD].map((letter) => keysByCode.get(`Key${letter}`));
+        const start = keysByCode.get('Space');
+
+        ghost.style.transition = 'none';
+        moveGhostTo(start);
+        ghost.getBoundingClientRect();
+        ghost.style.transition = '';
+        ghost.classList.add('is-visible');
+        await wait(500);
+
+        for (const key of typed) {
+          if (ghostState.isCancelled) {
+            break;
+          }
+
+          moveGhostTo(key);
+          await wait(430);
+
+          if (ghostState.isCancelled) {
+            break;
+          }
+
+          ghost.classList.add('is-clicking');
+          press(key);
+          key.classList.add('is-lit');
+          tooltip.show(key, key.dataset.tooltip);
+          await wait(120);
+          ghost.classList.remove('is-clicking');
+          await wait(520);
+        }
+
+        if (!ghostState.isCancelled) {
+          await wait(1400);
+          tooltip.hide();
+          cancelGhost();
+        }
+
+        ghostState.isRunning = false;
+      };
+
+      const stopGhostOnUserInput = () => {
+        if (ghostState.isRunning && !ghostState.isCancelled) {
+          cancelGhost();
+        }
+      };
+
+      ['pointermove', 'pointerdown', 'keydown', 'wheel', 'touchstart'].forEach((type) =>
+        window.addEventListener(type, stopGhostOnUserInput, { capture: true, passive: true }),
+      );
+
+      const startGhostWhenVisible = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            startGhostWhenVisible.disconnect();
+            document.fonts.ready.then(() => wait(700)).then(playGhost);
+          }
+        },
+        { threshold: 0.4 },
+      );
+      startGhostWhenVisible.observe(keyboard);
+
+      document.addEventListener('keydown', (event) => {
+        const key = keysByCode.get(event.code);
+
+        if (!key || event.repeat) {
+          return;
+        }
+
+        if (event.code === 'Space' && event.target === document.body) {
+          event.preventDefault();
+        }
+
+        press(key);
+        tooltip.show(key, key.dataset.tooltip);
+      });
+
+      const count = byId('count');
+      const updateCount = () => {
+        count.textContent = document.querySelectorAll('[role="tooltip"]').length;
+      };
+      new MutationObserver(updateCount).observe(document.body, { childList: true });
+
+      const copyText = async (text) => {
+        try {
+          await navigator.clipboard.writeText(text);
+          return true;
+        } catch {
+          return false;
+        }
+      };
+
+      const flashTooltip = (button, text, original) => {
+        clearTimeout(button.resetTimer);
+        button.dataset.tooltip = text;
+        button.resetTimer = setTimeout(() => {
+          button.dataset.tooltip = original;
+        }, 1600);
+      };
+
+      byId('copy-install').addEventListener('click', async (event) => {
+        const button = event.currentTarget;
+        const isCopied = await copyText('npm install @eburlak/tooltip');
+        flashTooltip(button, isCopied ? 'Copied to the clipboard' : 'Select the command and copy it', 'Copy the command');
+      });
+
+      byId('copy-demo').addEventListener('click', (event) => {
+        flashTooltip(event.currentTarget, 'Copied!', 'Copy link');
+      });
+
+      const addedState = { count: 0 };
+      byId('add-anchor').addEventListener('click', (event) => {
+        addedState.count += 1;
         const button = document.createElement('button');
-        addedCount += 1;
-        button.textContent = `Added ${addedCount}`;
-        button.dataset.tooltip = `Added after listen() - #${addedCount}`;
-        event.currentTarget.after(button);
+        button.type = 'button';
+        button.className = 'button';
+        button.textContent = `New ${addedState.count}`;
+        button.dataset.tooltip = `Added after listen(), works right away`;
+        event.currentTarget.before(button);
       });
 
-      let copyTimer;
-      byId('copy').addEventListener('click', (event) => {
-        const button = event.currentTarget;
-        clearTimeout(copyTimer);
-        button.dataset.tooltip = 'Copied!';
-        copyTimer = setTimeout(() => {
-          button.dataset.tooltip = 'Copy to clipboard';
-        }, 1500);
+      const swatches = byId('swatches');
+      const themeCode = byId('theme-code');
+
+      const renderThemeCode = ({ theme }) => {
+        const lines = Object.entries(theme).map(([name, value]) => {
+          const printed = typeof value === 'number' ? value : `"${value}"`;
+          return `    ${name}: <span class="token-string">${printed}</span>,`;
+        });
+
+        themeCode.innerHTML = [
+          'tooltip.configure({',
+          '  theme: {',
+          ...lines,
+          '  },',
+          '});',
+        ].join('\n');
+      };
+
+      THEMES.forEach((entry, index) => {
+        const swatch = document.createElement('button');
+        swatch.type = 'button';
+        swatch.className = 'swatch';
+        swatch.textContent = entry.name;
+        swatch.style.setProperty('--sample', entry.theme.background);
+        swatch.dataset.idleTooltip = `Click to apply the ${entry.name} theme`;
+        swatch.dataset.tooltip = swatch.dataset.idleTooltip;
+        swatch.setAttribute('aria-pressed', String(index === 0));
+
+        swatch.addEventListener('click', () => {
+          swatches.querySelectorAll('.swatch').forEach((other) => {
+            other.setAttribute('aria-pressed', String(other === swatch));
+            other.dataset.tooltip = other.dataset.idleTooltip;
+          });
+          tooltip.configure({ theme: entry.theme });
+          swatch.dataset.tooltip = `${entry.name} applied - now hover anything on the page`;
+          renderThemeCode(entry);
+        });
+
+        swatches.append(swatch);
       });
 
-      let hideTimer;
-      byId('manual').addEventListener('click', (event) => {
-        const button = event.currentTarget;
-        clearTimeout(hideTimer);
-        tooltip.show(button, 'Shown manually, hides in 2 s', 'bottom');
-        hideTimer = setTimeout(() => tooltip.hide(button), 2000);
-      });
-
-      const offsets = [8, 16, 0];
-      let offsetIndex = 0;
-      byId('offset').addEventListener('click', (event) => {
-        offsetIndex = (offsetIndex + 1) % offsets.length;
-        tooltip.configure({ offset: offsets[offsetIndex] });
-        event.currentTarget.textContent = `Offset: ${offsets[offsetIndex]}`;
-      });
-
-      let isAccent = false;
-      byId('theme').addEventListener('click', () => {
-        isAccent = !isAccent;
-        tooltip.configure({ theme: isAccent ? THEMES.accent : THEMES.dark });
-      });
-
-      byId('destroy').addEventListener('click', () => {
-        tooltip.destroy();
-        updateStatus();
-      });
-      document.addEventListener('mouseover', updateStatus);
-
-      updateStatus();
+      renderThemeCode(THEMES[0]);
+      updateCount();
     </script>
   </body>
 </html>
