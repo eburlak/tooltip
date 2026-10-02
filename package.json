@@ -1,0 +1,56 @@
+{
+  "name": "@eburlak/tooltip",
+  "version": "0.1.0",
+  "description": "Framework-agnostic themable tooltip for React and plain HTML",
+  "keywords": [
+    "tooltip",
+    "react",
+    "vanilla",
+    "accessible",
+    "theme",
+    "zero-dependency"
+  ],
+  "license": "MIT",
+  "author": "Evgeniy Burlak",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eburlak/tooltip.git"
+  },
+  "homepage": "https://github.com/eburlak/tooltip#readme",
+  "bugs": {
+    "url": "https://github.com/eburlak/tooltip/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/index.global.js",
+  "jsdelivr": "./dist/index.global.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./global": "./dist/index.global.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/index.global.js"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && tsc && node scripts/global.mjs",
+    "test": "vitest run",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm test"
+  },
+  "devDependencies": {
+    "jsdom": "^26.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0"
+  }
+}

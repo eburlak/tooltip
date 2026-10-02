@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Tooltip demo</title>
+    <style>
+      :root { color-scheme: light; }
+
+      * { box-sizing: border-box; }
+      body { margin: 0; padding: 0 24px 120px; font: 14px/1.5 system-ui, sans-serif; color: #1f2329; background: #f6f7f9; }
+      h1 { margin: 0; padding: 24px 0 4px; font-size: 22px; }
+      h2 { margin: 0 0 4px; font-size: 15px; }
+      p { margin: 0 0 12px; color: #5c6370; }
+      code { font: 12px ui-monospace, monospace; background: #eceef2; padding: 1px 4px; border-radius: 4px; }
+
+      section { margin-top: 16px; padding: 16px; background: #fff; border: 1px solid #e3e6eb; border-radius: 10px; }
+      .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .row.spread { justify-content: space-between; }
+
+      button { padding: 8px 14px; font: inherit; border: 1px solid #c9ced6; border-radius: 6px; background: #fff; cursor: pointer; }
+      button:hover { background: #f0f2f5; }
+      button:focus-visible { outline: 2px solid #3b5bdb; outline-offset: 2px; }
+
+      .top-edge { position: fixed; top: 4px; right: 24px; }
+      .bottom-edge { position: fixed; bottom: 4px; right: 24px; }
+
+      .scroller { height: 120px; overflow: auto; padding: 12px; border: 1px dashed #c9ced6; border-radius: 6px; }
+      .scroller > div { height: 360px; display: flex; flex-direction: column; align-items: flex-start; gap: 60px; }
+
+      #status { color: #5c6370; }
+    </style>
+  </head>
+  <body>
+    <button class="top-edge" data-tooltip="Asked for top, flipped to bottom">Near top edge</button>
+    <button class="bottom-edge" data-tooltip="Asked for bottom, flipped to top" data-tooltip-placement="bottom">Near bottom edge</button>
+
+    <h1>Tooltip demo</h1>
+    <p>One shared element for every anchor, its id is random per instance. Hover, focus with Tab, press Escape.</p>
+
+    <section>
+      <h2>Placement</h2>
+      <p>
+        Markup only: <code>data-tooltip</code> and <code>data-tooltip-placement</code>, <code>top</code> by default.
+        One <code>listen()</code> call serves every anchor, including ones added later.
+      </p>
+      <div class="row">
+        <button id="top" data-tooltip="Shown above">Top</button>
+        <button id="bottom" data-tooltip="Shown below" data-tooltip-placement="bottom">Bottom</button>
+        <button id="add">Add a button</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Auto flip</h2>
+      <p>The fixed buttons in the top and bottom right corners ask for the side that does not fit and get the opposite one.</p>
+    </section>
+
+    <section>
+      <h2>Viewport clamp</h2>
+      <p>Long text at the edges stays inside the viewport horizontally.</p>
+      <div class="row spread">
+        <button id="left-edge" data-tooltip="A fairly long tooltip that would overflow the left edge of the viewport">Left edge</button>
+        <button id="right-edge" data-tooltip="A fairly long tooltip that would overflow the right edge of the viewport">Right edge</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Multiline</h2>
+      <p>Line breaks are kept (<code>white-space: pre-line</code>), long words wrap by <code>theme.maxWidth</code>.</p>
+      <div class="row">
+        <button id="multiline" data-tooltip="Ctrl+S - save&#10;Ctrl+Z - undo&#10;Esc - close">Shortcuts</button>
+        <button id="long" data-tooltip="Supercalifragilisticexpialidocious_without_any_spaces_at_all wraps too">Long text</button>
+      </div>
+    </section>
+
+    <section>
+      <h2>Hides on scroll</h2>
+      <p>Any scroll, including nested containers, hides the tooltip.</p>
+      <div class="scroller">
+        <div>
+          <button data-tooltip="Scroll the box - I will hide">Inside scroller</button>
+          <button data-tooltip="Still the same element">Further down</button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Manual control and theming</h2>
+      <p>
+        <code>show(anchor, text)</code> / <code>hide()</code>, <code>configure({ offset })</code>,
+        <code>destroy()</code> and <code>configure({ theme })</code>, which regenerates the styles.
+        Copy changes its <code>data-tooltip</code> on click - the open tooltip follows it.
+      </p>
+      <div class="row">
+        <button id="copy" data-tooltip="Copy to clipboard">Copy</button>
+        <button id="manual">Show for 2 s</button>
+        <button id="offset" data-tooltip="Click to change the gap">Offset: 8</button>
+        <button id="theme" data-tooltip="Click - the theme is applied right away, styles are regenerated">Toggle accent theme</button>
+        <button id="destroy" data-tooltip="Removes markup and styles, the next show mounts them again">Destroy</button>
+        <span id="status"></span>
+      </div>
+    </section>
+
+    <script src="../dist/index.global.js"></script>
+    <script>
+      const THEMES = {
+        dark: { background: '#1f2329', color: '#fff', maxWidth: 280 },
+        accent: { background: '#3b5bdb', color: '#fff', maxWidth: 180 },
+      };
+
+      const tooltip = new Tooltip({ theme: THEMES.dark });
+
+      const byId = (id) => document.getElementById(id);
+      const status = byId('status');
+      const updateStatus = () => {
+        status.textContent = document.getElementById(tooltip.id) ? `#${tooltip.id} is mounted` : `#${tooltip.id} is removed`;
+      };
+
+      tooltip.listen();
+
+      let addedCount = 0;
+      byId('add').addEventListener('click', (event) => {
+        const button = document.createElement('button');
+        addedCount += 1;
+        button.textContent = `Added ${addedCount}`;
+        button.dataset.tooltip = `Added after listen() - #${addedCount}`;
+        event.currentTarget.after(button);
+      });
+
+      let copyTimer;
+      byId('copy').addEventListener('click', (event) => {
+        const button = event.currentTarget;
+        clearTimeout(copyTimer);
+        button.dataset.tooltip = 'Copied!';
+        copyTimer = setTimeout(() => {
+          button.dataset.tooltip = 'Copy to clipboard';
+        }, 1500);
+      });
+
+      let hideTimer;
+      byId('manual').addEventListener('click', (event) => {
+        const button = event.currentTarget;
+        clearTimeout(hideTimer);
+        tooltip.show(button, 'Shown manually, hides in 2 s', 'bottom');
+        hideTimer = setTimeout(() => tooltip.hide(button), 2000);
+      });
+
+      const offsets = [8, 16, 0];
+      let offsetIndex = 0;
+      byId('offset').addEventListener('click', (event) => {
+        offsetIndex = (offsetIndex + 1) % offsets.length;
+        tooltip.configure({ offset: offsets[offsetIndex] });
+        event.currentTarget.textContent = `Offset: ${offsets[offsetIndex]}`;
+      });
+
+      let isAccent = false;
+      byId('theme').addEventListener('click', () => {
+        isAccent = !isAccent;
+        tooltip.configure({ theme: isAccent ? THEMES.accent : THEMES.dark });
+      });
+
+      byId('destroy').addEventListener('click', () => {
+        tooltip.destroy();
+        updateStatus();
+      });
+      document.addEventListener('mouseover', updateStatus);
+
+      updateStatus();
+    </script>
+  </body>
+</html>
