@@ -1,14 +1,32 @@
 {
   "name": "@eburlak/tooltip",
   "version": "0.1.0",
-  "description": "Framework-agnostic themable tooltip for React and plain HTML",
+  "description": "Accessible, zero-dependency tooltip for React and vanilla JS: one shared element that glides between anchors, data-tooltip attributes, themes, TypeScript, ~2.3 kB gzipped",
   "keywords": [
     "tooltip",
-    "react",
-    "vanilla",
+    "tooltips",
+    "react-tooltip",
+    "vanilla-tooltip",
+    "javascript-tooltip",
+    "typescript-tooltip",
+    "data-tooltip",
+    "hint",
+    "title",
+    "hover",
     "accessible",
-    "theme",
-    "zero-dependency"
+    "a11y",
+    "aria",
+    "aria-describedby",
+    "zero-dependency",
+    "no-dependencies",
+    "lightweight",
+    "tiny",
+    "framework-agnostic",
+    "vanilla-js",
+    "react",
+    "typescript",
+    "themable",
+    "animated"
   ],
   "license": "MIT",
   "author": "Evgeniy Burlak",
@@ -16,7 +34,7 @@
     "type": "git",
     "url": "git+https://github.com/eburlak/tooltip.git"
   },
-  "homepage": "https://github.com/eburlak/tooltip#readme",
+  "homepage": "https://eburlak.github.io/tooltip/",
   "bugs": {
     "url": "https://github.com/eburlak/tooltip/issues"
   },

@@ -1,8 +1,24 @@
 # @eburlak/tooltip
 
-Tooltip without dependencies, for React and plain HTML. An instance mounts one
-`<div role="tooltip">` and one `<style>` on the first `show`; every anchor it serves reuses
-the same element. Create one instance per app and share it.
+[![npm](https://img.shields.io/npm/v/@eburlak/tooltip)](https://www.npmjs.com/package/@eburlak/tooltip)
+[![gzip size](https://img.shields.io/bundlejs/size/@eburlak/tooltip)](https://bundlejs.com/?q=@eburlak/tooltip)
+[![types](https://img.shields.io/npm/types/@eburlak/tooltip)](./src/index.ts)
+[![license](https://img.shields.io/npm/l/@eburlak/tooltip)](./LICENSE)
+
+Accessible, zero-dependency tooltip for React and vanilla JS. One shared element glides
+between anchors - position, size and text morph instead of popping in and out.
+
+**[Live demo](https://eburlak.github.io/tooltip/)**
+
+- **Markup only** - `data-tooltip="Save"` on any element and one `listen()` call; elements added later work too.
+- **React and plain HTML** - the same attributes in JSX, or spreadable `onMouseEnter`/`onFocus` listeners.
+- **Accessible** - `role="tooltip"`, `aria-describedby`, keyboard focus, `Escape`, `prefers-reduced-motion`.
+- **Smart placement** - flips to the other side when there is no room and stays inside the viewport.
+- **Themable at runtime** - colors, font, radius, width and speed; `configure()` restyles an open tooltip with an animation.
+- **Tiny** - about 2.3 kB gzipped, no dependencies, TypeScript types included.
+
+An instance mounts one `<div role="tooltip">` and one `<style>` on the first `show`; every
+anchor it serves reuses the same element. Create one instance per app and share it.
 
 ```sh
 npm install @eburlak/tooltip
@@ -100,7 +116,8 @@ Animations are off under `prefers-reduced-motion`.
 ## Scripts
 
 `npm run build` - a clean `dist/` via tsc plus `dist/index.global.js`, `npm test` - vitest + jsdom,
-`example/index.html` - demo, open it straight from disk after the build.
+`example/index.html` - the demo, open it straight from disk after the build; `.github/workflows/demo.yml`
+publishes it to GitHub Pages on every push to `main`.
 
 `npm publish` builds the package on `prepack` and runs the tests on `prepublishOnly`.
 
