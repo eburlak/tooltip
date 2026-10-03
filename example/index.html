@@ -445,7 +445,7 @@
           <div>
             <h2>Markup is the whole API</h2>
             <p>
-              Put the text in <code>data-tooltip</code> and call <code>listen()</code> once. Elements added later
+              Put the text in <code>data-tooltip</code> and create one <code>Tooltip</code>. Elements added later
               work too, and the open tooltip follows when the attribute changes - press Copy and watch.
             </p>
           </div>
@@ -462,7 +462,7 @@
 
 <span class="token-tag">import</span> { Tooltip } <span class="token-tag">from</span> <span class="token-string">'@eburlak/tooltip'</span>;
 
-<span class="token-tag">new</span> Tooltip().listen(); <span class="token-dim">// every [data-tooltip], now and later</span></code></pre>
+<span class="token-tag">new</span> Tooltip(); <span class="token-dim">// every [data-tooltip], now and later</span></code></pre>
           </div>
         </section>
 
@@ -484,13 +484,12 @@
           <div>
             <h2>Same in React</h2>
             <p>
-              The attributes work in JSX after one <code>listen()</code> at startup, and a re-render that changes the
+              The attributes work in JSX as soon as the instance exists, and a re-render that changes the
               text updates the open tooltip. No provider, no portal, no wrapper component.
             </p>
           </div>
           <pre><code><span class="token-dim">// tooltip.ts</span>
 <span class="token-tag">export const</span> tooltip = <span class="token-tag">new</span> Tooltip({ theme: { maxWidth: <span class="token-string">240</span> } });
-tooltip.listen();
 
 <span class="token-dim">// CopyButton.tsx</span>
 <span class="token-tag">&lt;button</span> <span class="token-attr">data-tooltip</span>={isCopied ? <span class="token-string">'Copied!'</span> : <span class="token-string">'Copy'</span>}<span class="token-tag">&gt;</span>
@@ -594,7 +593,6 @@ tooltip.listen();
       const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
       const tooltip = new Tooltip({ theme: { ...THEMES[0].theme, duration: 240 } });
-      tooltip.listen();
 
       const byId = (id) => document.getElementById(id);
       const wait = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
@@ -777,7 +775,7 @@ tooltip.listen();
         button.type = 'button';
         button.className = 'button';
         button.textContent = `New ${addedState.count}`;
-        button.dataset.tooltip = `Added after listen(), works right away`;
+        button.dataset.tooltip = 'Added after the tooltip was created, works right away';
         event.currentTarget.before(button);
       });
 

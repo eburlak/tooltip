@@ -10,7 +10,7 @@ between anchors - position, size and text morph instead of popping in and out.
 
 **[Live demo](https://eburlak.github.io/tooltip/)**
 
-- **Markup only** - `data-tooltip="Save"` on any element and one `listen()` call; elements added later work too.
+- **Markup only** - `data-tooltip="Save"` on any element and `new Tooltip()`; elements added later work too.
 - **React and plain HTML** - the same attributes in JSX, or spreadable `onMouseEnter`/`onFocus` listeners.
 - **Accessible** - `role="tooltip"`, `aria-describedby`, keyboard focus, `Escape`, `prefers-reduced-motion`.
 - **Smart placement** - flips to the other side when there is no room and stays inside the viewport.
@@ -18,7 +18,8 @@ between anchors - position, size and text morph instead of popping in and out.
 - **Tiny** - about 2.3 kB gzipped, no dependencies, TypeScript types included.
 
 An instance mounts one `<div role="tooltip">` and one `<style>` on the first `show`; every
-anchor it serves reuses the same element. Create one instance per app and share it.
+anchor it serves reuses the same element. Create one instance per app and share it: every
+instance listens to its root, so two instances on one root would both answer the same anchor.
 
 ```sh
 npm install @eburlak/tooltip
@@ -26,8 +27,9 @@ npm install @eburlak/tooltip
 
 ## Markup
 
-One delegated `listen()` serves every `[data-tooltip]` under the root, including elements
-added later. While a tooltip is open its anchor is observed: a new `data-tooltip` or
+The constructor delegates listeners to `root` (the whole document by default) and serves every
+`[data-tooltip]` under it, including elements added later. On the server, where there is no
+`document`, it skips listening, so an instance can be created at module level. While a tooltip is open its anchor is observed: a new `data-tooltip` or
 `data-tooltip-placement` is applied right away with the same crossfade, removing the text
 hides it.
 
@@ -39,7 +41,6 @@ hides it.
   import { Tooltip } from 'https://cdn.jsdelivr.net/npm/@eburlak/tooltip/+esm';
 
   const tooltip = new Tooltip({ theme: { background: '#3b5bdb' } });
-  const unlisten = tooltip.listen();
 </script>
 ```
 
@@ -49,13 +50,13 @@ It is also the default file on unpkg and jsDelivr, and `@eburlak/tooltip/global`
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@eburlak/tooltip"></script>
 <script>
-  new Tooltip().listen();
+  new Tooltip();
 </script>
 ```
 
 ## React
 
-The same attributes work in JSX after one `listen()` at startup, and a re-render that
+The same attributes work in JSX once the instance is created, and a re-render that
 changes the text updates the open tooltip (`data-tooltip={isCopied ? 'Copied!' : 'Copy'}`):
 
 ```tsx
@@ -63,7 +64,6 @@ changes the text updates the open tooltip (`data-tooltip={isCopied ? 'Copied!' :
 import { Tooltip } from '@eburlak/tooltip';
 
 export const tooltip = new Tooltip({ theme: { maxWidth: 240 } });
-tooltip.listen();
 ```
 
 ```tsx
@@ -71,7 +71,7 @@ tooltip.listen();
 <a href="#" data-tooltip="Open" data-tooltip-placement="bottom">Open</a>
 ```
 
-Or spread listeners on a single element without a global `listen()`; their text is fixed
+Or spread listeners on an element without `data-tooltip`; their text is fixed
 when they are created, call `tooltip.show(anchor, text)` to change an open tooltip:
 
 ```tsx
@@ -82,13 +82,12 @@ when they are created, call `tooltip.show(anchor, text)` to change an open toolt
 
 | Method | Purpose |
 | --- | --- |
-| `new Tooltip({ placement, offset, theme })` | defaults: `'top'`, `8`, theme below |
-| `listen(root = document)` | delegated listeners for `[data-tooltip]` / `[data-tooltip-placement]`, returns `unlisten()` |
+| `new Tooltip({ placement, offset, theme, root })` | defaults: `'top'`, `8`, theme below, `document`; listens to `[data-tooltip]` / `[data-tooltip-placement]` under `root` |
 | `getListeners(text, placement?)` | `{ onMouseEnter, onMouseLeave, onFocus, onBlur }` to spread on a React element |
 | `attach(element, text, placement?)` | the same listeners via `addEventListener`, returns `detach()` |
 | `show(anchor, text, placement?)` / `hide(anchor?)` | manual control; with an anchor, `hide` does nothing once the tooltip has moved to another one |
 | `configure({ placement, offset, theme })` | merges into the current options; a theme regenerates the mounted styles and an open tooltip animates into it |
-| `destroy()` | removes markup and styles; the next `show` mounts them again |
+| `destroy()` | stops listening, removes markup and styles; a manual `show` mounts them again |
 | `id` | random element id, `tooltip-` plus 8 characters, unique per instance |
 
 ## Theme
