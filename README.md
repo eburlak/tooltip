@@ -106,7 +106,8 @@ Any subset, merged with the defaults; styles are generated from the values, no C
 
 Fades in sliding down and fades out sliding up. Moving to another anchor while still
 visible slides and resizes it and crossfades the text; an 80ms hide delay keeps it opaque
-while the pointer crosses the gap. Hides on mouse leave, blur, `Escape` and any scroll.
+while the pointer crosses the gap. Hides on mouse leave, blur, `Escape` and any scroll, follows its
+anchor when the window is resized.
 Flips to the other side when the preferred one does not fit and clamps to the viewport
 horizontally.
 

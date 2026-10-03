@@ -78,9 +78,7 @@ export class Tooltip {
       this.style.textContent = getCss(this.id, this.options.theme);
     }
 
-    if (this.anchor && this.content) {
-      this.show(this.anchor, this.content.text, this.content.placement);
-    }
+    this.refresh();
   }
 
   getListeners(text: string, placement?: TPlacement): IListeners {
@@ -172,6 +170,7 @@ export class Tooltip {
     this.position(anchor, element, placement ?? this.options.placement, size);
 
     window.addEventListener('scroll', this.handleScroll, true);
+    window.addEventListener('resize', this.handleResize);
     document.addEventListener('keydown', this.handleKeyDown);
   };
 
@@ -190,6 +189,7 @@ export class Tooltip {
     }
 
     window.removeEventListener('scroll', this.handleScroll, true);
+    window.removeEventListener('resize', this.handleResize);
     document.removeEventListener('keydown', this.handleKeyDown);
   };
 
@@ -296,7 +296,15 @@ export class Tooltip {
     element.style.transform = `translate(${Math.round(left)}px, ${Math.round(isAbove ? top.above : top.below)}px)`;
   }
 
+  private refresh() {
+    if (this.anchor && this.content) {
+      this.show(this.anchor, this.content.text, this.content.placement);
+    }
+  }
+
   private handleScroll = () => this.hide();
+
+  private handleResize = () => this.refresh();
 
   private handleKeyDown = (event: KeyboardEvent) => {
     if (event.key === 'Escape') {

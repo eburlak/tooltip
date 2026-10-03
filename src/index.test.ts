@@ -130,6 +130,32 @@ describe('tooltip', () => {
       expect(getPlacement()).toBe('bottom');
     });
 
+    it('follows the anchor when the window is resized', () => {
+      const button = createRoomyButton();
+      tooltip.show(button, 'Text');
+      const initialTransform = getTooltip().style.transform;
+
+      button.getBoundingClientRect = () => new DOMRect(400, 300, 80, 20);
+      window.dispatchEvent(new Event('resize'));
+
+      expect(getTooltip().style.transform).not.toBe(initialTransform);
+      expect(getTooltip().hidden).toBe(false);
+      expect(getTooltip().children).toHaveLength(1);
+    });
+
+    it('stops following resizes once hidden', () => {
+      const button = createRoomyButton();
+      tooltip.show(button, 'Text');
+      tooltip.hide();
+      const hiddenTransform = getTooltip().style.transform;
+
+      button.getBoundingClientRect = () => new DOMRect(400, 300, 80, 20);
+      window.dispatchEvent(new Event('resize'));
+
+      expect(getTooltip().style.transform).toBe(hiddenTransform);
+      expect(getTooltip().hidden).toBe(true);
+    });
+
     it('keeps an explicit placement of an open tooltip on configure', () => {
       tooltip.show(createRoomyButton(), 'Text', 'top');
       tooltip.configure({ placement: 'bottom' });
