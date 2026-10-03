@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Tooltip } from './index.js';
 
 let tooltip: Tooltip;
@@ -152,11 +152,7 @@ describe('tooltip', () => {
   });
 });
 
-describe('listen', () => {
-  let unlisten = () => {};
-
-  afterEach(() => unlisten());
-
+describe('delegation', () => {
   const createAnchor = (attributes: Record<string, string>) => {
     const button = createButton();
     Object.entries(attributes).forEach(([name, value]) => button.setAttribute(name, value));
@@ -171,7 +167,6 @@ describe('listen', () => {
     target.dispatchEvent(new MouseEvent('mouseout', { bubbles: true, relatedTarget }));
 
   it('shows text and placement from data attributes, including nested targets', () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Delete', 'data-tooltip-placement': 'bottom' });
 
     hover(button.firstElementChild!);
@@ -181,7 +176,6 @@ describe('listen', () => {
   });
 
   it('hides only when the pointer leaves the anchor', () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Save' });
 
     hover(button);
@@ -193,7 +187,6 @@ describe('listen', () => {
   });
 
   it('handles focus and reads the attribute at show time', () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Old' });
     button.setAttribute('data-tooltip', 'New');
 
@@ -205,7 +198,6 @@ describe('listen', () => {
   });
 
   it('follows attribute changes while the tooltip is shown', async () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Copy' });
 
     hover(button);
@@ -219,7 +211,6 @@ describe('listen', () => {
   });
 
   it('ignores writes of the same value', async () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Copy' });
 
     hover(button);
@@ -230,7 +221,6 @@ describe('listen', () => {
   });
 
   it('hides when the text is removed while shown', async () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Copy' });
 
     hover(button);
@@ -241,7 +231,6 @@ describe('listen', () => {
   });
 
   it('stops following the anchor after it is left', async () => {
-    unlisten = tooltip.listen();
     const button = createAnchor({ 'data-tooltip': 'Copy' });
 
     hover(button);
@@ -253,10 +242,11 @@ describe('listen', () => {
     expect(getTooltip().textContent).toBe('Copy');
   });
 
-  it('ignores anchors outside the root and stops after unlisten', () => {
+  it('listens only inside the given root and stops after destroy', () => {
     const root = document.createElement('div');
     document.body.append(root);
-    unlisten = tooltip.listen(root);
+    tooltip.destroy();
+    tooltip = new Tooltip({ root });
 
     hover(createAnchor({ 'data-tooltip': 'Outside' }));
     expect(getTooltip()).toBeNull();
@@ -266,12 +256,22 @@ describe('listen', () => {
     hover(inside);
     expect(getTooltip().textContent).toBe('Inside');
 
-    unlisten();
-    expect(getTooltip().hidden).toBe(true);
+    tooltip.destroy();
+    expect(getTooltip()).toBeNull();
 
     hover(inside);
-    expect(getTooltip().hidden).toBe(true);
+    expect(getTooltip()).toBeNull();
     root.remove();
+  });
+
+  it('skips listening where there is no document', () => {
+    vi.stubGlobal('document', undefined);
+
+    try {
+      expect(() => new Tooltip()).not.toThrow();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });
 

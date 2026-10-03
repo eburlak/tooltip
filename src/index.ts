@@ -14,6 +14,10 @@ export interface IConfig extends Partial<Omit<IOptions, 'theme'>> {
   theme?: Partial<ITheme>;
 }
 
+export interface IInitialConfig extends IConfig {
+  root?: Document | Element;
+}
+
 interface IAnchorEvent {
   currentTarget: EventTarget | null;
 }
@@ -54,10 +58,17 @@ export class Tooltip {
   private content: { text: string; placement?: TPlacement } | null = null;
   private observer: MutationObserver | null = null;
   private options: IOptions = { placement: 'top', offset: 8, theme: DEFAULT_THEME };
+  private unlisten = () => {};
 
-  constructor(config: IConfig = {}) {
+  constructor({ root, ...config }: IInitialConfig = {}) {
     this.id = getId();
     this.configure(config);
+
+    const isBrowser = typeof document !== 'undefined';
+
+    if (isBrowser) {
+      this.unlisten = this.listen(root ?? document);
+    }
   }
 
   configure({ theme, ...options }: IConfig) {
@@ -101,7 +112,7 @@ export class Tooltip {
     };
   }
 
-  listen(root: Document | Element = document) {
+  private listen(root: Document | Element) {
     const handleEnter = (event: Event) => {
       const anchor = getAnchor(event.target);
 
@@ -130,13 +141,7 @@ export class Tooltip {
 
     listeners.forEach(([type, listener]) => root.addEventListener(type, listener));
 
-    return () => {
-      listeners.forEach(([type, listener]) => root.removeEventListener(type, listener));
-
-      if (this.anchor && root.contains(this.anchor)) {
-        this.hide();
-      }
-    };
+    return () => listeners.forEach(([type, listener]) => root.removeEventListener(type, listener));
   }
 
   show = (anchor: Element, text: string, placement?: TPlacement) => {
@@ -189,6 +194,7 @@ export class Tooltip {
   };
 
   destroy() {
+    this.unlisten();
     this.hide();
     this.element?.remove();
     this.style?.remove();
