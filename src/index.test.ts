@@ -105,8 +105,8 @@ describe('tooltip', () => {
 
     tooltip.show(createButton(), 'Two');
     expect(getTooltip().hasAttribute('data-switching')).toBe(true);
-    expect(getTooltip().lastElementChild?.textContent).toBe('Two');
-    expect(getTooltip().querySelector('[data-leaving]')?.getAttribute('aria-hidden')).toBe('true');
+    expect(getTooltip().textContent).toBe('Two');
+    expect(getTooltip().children).toHaveLength(1);
 
     tooltip.hide();
     tooltip.show(createButton(), 'Three');
@@ -231,7 +231,7 @@ describe('delegation', () => {
     button.setAttribute('data-tooltip-placement', 'bottom');
     await flushMutations();
 
-    expect(getTooltip().lastElementChild?.textContent).toBe('Copied!');
+    expect(getTooltip().textContent).toBe('Copied!');
     expect(getTooltip().hasAttribute('data-switching')).toBe(true);
     expect(button.getAttribute('aria-describedby')).toBe(tooltip.id);
   });
@@ -240,10 +240,11 @@ describe('delegation', () => {
     const button = createAnchor({ 'data-tooltip': 'Copy' });
 
     hover(button);
+    const show = vi.spyOn(tooltip, 'show');
     button.setAttribute('data-tooltip', 'Copy');
     await flushMutations();
 
-    expect(getTooltip().querySelector('[data-leaving]')).toBeNull();
+    expect(show).not.toHaveBeenCalled();
   });
 
   it('hides when the text is removed while shown', async () => {
@@ -322,35 +323,34 @@ describe('theme', () => {
     expect(document.querySelectorAll('style')).toHaveLength(1);
   });
 
-  it('re-renders an open tooltip on configure without crossfading the same text', () => {
+  it('re-renders an open tooltip on configure in place', () => {
     const button = createButton();
     tooltip.show(button, 'Themed');
-    const content = getTooltip().lastElementChild;
+    const content = getTooltip().firstElementChild;
 
     tooltip.configure({ theme: { maxWidth: 120 } });
 
     expect(getTooltip().hasAttribute('data-switching')).toBe(true);
     expect(getTooltip().children).toHaveLength(1);
-    expect(getTooltip().lastElementChild).toBe(content);
+    expect(getTooltip().firstElementChild).toBe(content);
     expect(button.getAttribute('aria-describedby')).toBe(tooltip.id);
   });
 
-  it('disables every animation under reduced motion', () => {
+  it('disables every transition under reduced motion', () => {
     tooltip.show(createButton(), 'Themed');
     const rules = Array.from(document.head.querySelector('style')!.sheet!.cssRules);
     const reducedMotion = rules.find((rule): rule is CSSMediaRule => rule instanceof CSSMediaRule)!;
     const getSelectors = (rule: CSSStyleRule) => rule.selectorText.split(',').map((selector) => selector.trim());
 
-    const animated = rules
-      .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule && Boolean(rule.style.animation))
-      .map((rule) => rule.selectorText);
+    const transitioned = rules
+      .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule && Boolean(rule.style.getPropertyValue('transition-duration')))
+      .flatMap(getSelectors);
     const disabled = Array.from(reducedMotion.cssRules)
-      .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule)
-      .filter((rule) => rule.style.animation === 'none' || rule.style.display === 'none')
+      .filter((rule): rule is CSSStyleRule => rule instanceof CSSStyleRule && rule.style.getPropertyValue('transition') === 'none')
       .flatMap(getSelectors);
 
-    expect(animated.length).toBeGreaterThan(0);
-    expect(disabled).toEqual(expect.arrayContaining(animated));
+    expect(transitioned.length).toBeGreaterThan(0);
+    expect(disabled).toEqual(expect.arrayContaining(transitioned));
   });
 
   it('does not show a hidden tooltip on configure', () => {

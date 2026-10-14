@@ -48,16 +48,6 @@ const getAnchor = (target: EventTarget | null) =>
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
-const removeSiblings = (element: Element) =>
-  Array.from(element.parentElement?.children ?? []).forEach((child) => child !== element && child.remove());
-
-const getRemainingTime = (element: Element | null) => {
-  const [animation] = element?.getAnimations?.() ?? [];
-  const { endTime = 0, localTime = 0 } = animation?.effect?.getComputedTiming() ?? {};
-
-  return Math.max(Number(endTime) - Number(localTime), 0);
-};
-
 const getId = () => `tooltip-${Math.random().toString(36).slice(2, 10)}`;
 
 export class Tooltip {
@@ -169,7 +159,7 @@ export class Tooltip {
 
     element.toggleAttribute('data-switching', isSwitching);
     element.hidden = false;
-    const size = this.render(element, text, isSwitching);
+    const size = this.render(element, text);
 
     if (isSwitching) {
       this.resize(element, previousSize);
@@ -258,33 +248,8 @@ export class Tooltip {
     return this.element;
   }
 
-  private render(element: HTMLElement, text: string, isSwitching: boolean): ISize {
-    const previousContent = isSwitching ? (element.lastElementChild as HTMLElement | null) : null;
-    const content = previousContent?.textContent === text ? previousContent : document.createElement('span');
-
-    if (!previousContent) {
-      element.replaceChildren(content);
-    } else if (content !== previousContent) {
-      const { opacity } = getComputedStyle(previousContent);
-      const isWaitingForLeaving = opacity === '0';
-
-      if (isWaitingForLeaving) {
-        previousContent.remove();
-        content.style.animationDelay = `${getRemainingTime(element.lastElementChild)}ms`;
-      } else {
-        const leavingTime = `${(this.options.theme.duration / 2) * Number(opacity)}ms`;
-
-        removeSiblings(previousContent);
-        previousContent.style.opacity = opacity;
-        previousContent.style.animationDelay = '';
-        previousContent.style.animationDuration = leavingTime;
-        content.style.animationDelay = leavingTime;
-        previousContent.setAttribute('data-leaving', '');
-        previousContent.setAttribute('aria-hidden', 'true');
-      }
-
-      element.append(content);
-    }
+  private render(element: HTMLElement, text: string): ISize {
+    const content = element.querySelector('span') ?? element.appendChild(document.createElement('span'));
 
     content.textContent = text;
 
@@ -293,7 +258,7 @@ export class Tooltip {
     element.style.height = '';
     element.style.maxWidth = '';
     const { width, height } = element.getBoundingClientRect();
-    content.style.width = `${Math.ceil(parseFloat(getComputedStyle(content).width))}px`;
+    content.style.width = `${Math.ceil(content.getBoundingClientRect().width)}px`;
 
     return { width: Math.ceil(width), height: Math.ceil(height) };
   }

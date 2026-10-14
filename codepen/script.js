@@ -138,15 +138,4 @@ Object.entries(apps).forEach(([name, app]) => {
   app.addEventListener('animationend', () => app.classList.remove('is-launching'));
 });
 
-query('.dock').addEventListener('keydown', (event) => {
-  const step = { ArrowRight: 1, ArrowLeft: -1 }[event.key];
-  const list = Object.values(apps);
-  const index = list.indexOf(document.activeElement);
-
-  if (step && index !== -1) {
-    event.preventDefault();
-    list[(index + step + list.length) % list.length].focus();
-  }
-});
-
 startDownload();

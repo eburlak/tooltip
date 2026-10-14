@@ -97,41 +97,12 @@ svg {
   letter-spacing: 0.005em;
 }
 
-kbd {
-  display: inline-grid;
-  place-items: center;
-  min-width: 18px;
-  height: 18px;
-  margin: 0 1px;
-  padding: 0 4px;
-  border: 1px solid var(--hairline-strong);
-  border-bottom-width: 2px;
-  border-radius: 5px;
-  color: var(--muted);
-  font: 500 10px/1 var(--mono);
-}
-
-.caption {
-  margin: 0;
-  color: var(--faint);
-  font: 400 11px/18px var(--mono);
-  letter-spacing: 0.02em;
-  text-align: center;
-  white-space: nowrap;
-}
-
-.caption span {
-  margin: 0 6px;
-  opacity: 0.6;
-}
-
 /* Layout: the hero takes the free space, so the dock sticks to the bottom */
 
 .dock-area {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
 .hero {
@@ -639,10 +610,6 @@ kbd {
 
   .icon {
     padding: 9px;
-  }
-
-  .caption {
-    font-size: 10px;
   }
 
   .badge {

@@ -1,6 +1,6 @@
 {
   "name": "@eburlak/tooltip",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Accessible, zero-dependency tooltip for React and vanilla JS: one shared element that travels between anchors, data-tooltip attributes, themes, TypeScript, ~2.3 kB gzipped",
   "keywords": [
     "tooltip",

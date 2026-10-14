@@ -50,27 +50,6 @@ export const getCss = (id: string, theme: ITheme) => `
   transition-behavior: normal, normal, allow-discrete, normal, normal, normal, normal, normal, normal;
 }
 
-#${id} > span[data-leaving] + span {
-  animation: ${id}-text-in ${theme.duration / 2}ms ${theme.duration / 2}ms ease-out backwards;
-}
-
-#${id} > span[data-leaving] {
-  position: absolute;
-  animation: ${id}-text-out ${theme.duration / 2}ms ease-in forwards;
-}
-
-@keyframes ${id}-text-in {
-  from {
-    opacity: 0;
-  }
-}
-
-@keyframes ${id}-text-out {
-  to {
-    opacity: 0;
-  }
-}
-
 /* The delay keeps the tooltip opaque while the pointer crosses the gap to the next anchor */
 #${id}[hidden] {
   display: none;
@@ -87,15 +66,8 @@ export const getCss = (id: string, theme: ITheme) => `
 }
 
 @media (prefers-reduced-motion: reduce) {
-  #${id},
-  #${id} > span,
-  #${id} > span[data-leaving] + span {
+  #${id} {
     transition: none;
-    animation: none;
-  }
-
-  #${id} > span[data-leaving] {
-    display: none;
   }
 }
 `;
