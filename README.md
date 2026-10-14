@@ -5,7 +5,7 @@
 [![types](https://img.shields.io/npm/types/@eburlak/tooltip)](./src/index.ts)
 [![license](https://img.shields.io/npm/l/@eburlak/tooltip)](./LICENSE)
 
-Accessible, zero-dependency tooltip for React and vanilla JS. One shared element glides
+Accessible, zero-dependency tooltip for React and vanilla JS. One shared element travels
 between anchors - position, size and text morph instead of popping in and out.
 
 **[Live demo](https://eburlak.github.io/tooltip/)**
@@ -30,7 +30,7 @@ npm install @eburlak/tooltip
 The constructor delegates listeners to `root` (the whole document by default) and serves every
 `[data-tooltip]` under it, including elements added later. On the server, where there is no
 `document`, it skips listening, so an instance can be created at module level. While a tooltip is open its anchor is observed: a new `data-tooltip` or
-`data-tooltip-placement` is applied right away with the same crossfade, removing the text
+`data-tooltip-placement` is applied right away with the same text swap, removing the text
 hides it.
 
 ```html
@@ -105,7 +105,7 @@ Any subset, merged with the defaults; styles are generated from the values, no C
 | `duration` | `200` (ms, every animation) |
 
 Fades in sliding down and fades out sliding up. Moving to another anchor while still
-visible slides and resizes it and crossfades the text; an 80ms hide delay keeps it opaque
+visible slides and resizes it and swaps the text: the old one fades out, then the new one fades in; an 80ms hide delay keeps it opaque
 while the pointer crosses the gap. Hides on mouse leave, blur, `Escape` and any scroll, follows its
 anchor when the window is resized.
 Flips to the other side when the preferred one does not fit and clamps to the viewport

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@eburlak/tooltip - one tooltip that travels</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&family=Instrument+Serif:ital@1&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <svg class="sprite" aria-hidden="true">
+      <defs>
+        <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></symbol>
+        <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="m16.24 7.76-2.12 6.36-6.36 2.12 2.12-6.36z" /></symbol>
+        <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></symbol>
+        <symbol id="i-message" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z" /></symbol>
+        <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></symbol>
+        <symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6" /></symbol>
+        <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-6-6-6M12 19h8" /></symbol>
+        <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M2 14h4M10 8h4M18 16h4" /></symbol>
+        <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><path d="m7 10 5 5 5-5M12 15V3" /></symbol>
+        <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></symbol>
+      </defs>
+    </svg>
+
+    <div id="app">
+      <main class="hero">
+        <ul class="hero__stats">
+          <li data-tooltip="Latest on npm">v0.3.2</li>
+          <li data-tooltip="Minified + gzipped&#10;global build included">2.3 kB</li>
+          <li data-tooltip="Zero runtime dependencies">0 deps</li>
+          <li data-tooltip="role=tooltip, aria-describedby&#10;focus, Esc, reduced motion">a11y</li>
+        </ul>
+        <h1 class="hero__title">One tooltip.<br />It <em>travels.</em></h1>
+        <p class="hero__lead">
+          A single element slides, resizes and swaps text between anchors instead of popping in and out. React or plain HTML, one <code>data-tooltip</code> attribute.
+        </p>
+        <div class="install">
+          <code class="install__command">npm i @eburlak/tooltip</code>
+          <button class="copy" data-tooltip="Copy"><svg><use href="#i-copy" /></svg></button>
+        </div>
+        <p class="hero__links">
+          <a href="https://github.com/eburlak/tooltip" target="_blank" rel="noopener" data-tooltip="Source and issues">GitHub <span aria-hidden="true">↗</span></a>
+          <a href="https://www.npmjs.com/package/@eburlak/tooltip" target="_blank" rel="noopener" data-tooltip="Package page">npm <span aria-hidden="true">↗</span></a>
+          <a href="https://eburlak.github.io/tooltip/" target="_blank" rel="noopener" data-tooltip="API, themes, full demo">Docs <span aria-hidden="true">↗</span></a>
+        </p>
+        <div class="themes" role="group" aria-label="Tooltip theme">
+          <button class="swatch" data-theme="snow" data-tooltip-placement="bottom"></button>
+          <button class="swatch" data-theme="indigo" data-tooltip-placement="bottom"></button>
+          <button class="swatch" data-theme="lime" data-tooltip-placement="bottom"></button>
+          <button class="swatch" data-theme="coral" data-tooltip-placement="bottom"></button>
+          <button class="swatch" data-theme="graphite" data-tooltip-placement="bottom"></button>
+        </div>
+      </main>
+
+      <footer class="dock-area">
+        <nav class="dock" aria-label="Dock">
+          <button class="app" data-app="browser" data-tooltip="Browser">
+            <span class="icon icon--browser"><svg><use href="#i-compass" /></svg></span>
+          </button>
+          <button class="app" data-app="mail" data-tooltip="Mail&#10;3 unread">
+            <span class="icon icon--mail"><svg><use href="#i-mail" /></svg></span>
+            <span class="badge">3</span>
+          </button>
+          <button class="app" data-app="messages" data-tooltip="Messages&#10;Alex: ship it? 🚀">
+            <span class="icon icon--messages"><svg><use href="#i-message" /></svg></span>
+            <span class="badge">1</span>
+          </button>
+          <button class="app" data-app="calendar">
+            <span class="icon icon--calendar"><b class="calendar__weekday"></b><b class="calendar__day"></b></span>
+          </button>
+          <button class="app" data-app="music" data-tooltip="Music&#10;Paused">
+            <span class="icon icon--music"><svg><use href="#i-music" /></svg></span>
+          </button>
+          <button class="app" data-app="photos" data-tooltip="Photos">
+            <span class="icon icon--photos"></span>
+          </button>
+          <button class="app" data-app="editor" data-tooltip="Editor">
+            <span class="icon icon--editor"><svg><use href="#i-code" /></svg></span>
+          </button>
+          <button class="app" data-app="terminal" data-tooltip="Terminal">
+            <span class="icon icon--terminal"><svg><use href="#i-terminal" /></svg></span>
+          </button>
+          <button class="app" data-app="settings" data-tooltip="Settings">
+            <span class="icon icon--settings"><svg><use href="#i-sliders" /></svg></span>
+          </button>
+          <span class="dock__divider" aria-hidden="true"></span>
+          <button class="app" data-app="downloads">
+            <span class="icon icon--downloads"><svg><use href="#i-download" /></svg><i class="progress"></i></span>
+          </button>
+          <button class="app" data-app="trash" data-tooltip="Trash&#10;12 items">
+            <span class="icon icon--trash"><svg><use href="#i-trash" /></svg></span>
+          </button>
+        </nav>
+        <p class="caption">hover, click, or <kbd>Tab</kbd> <kbd>←</kbd><kbd>→</kbd> <span>·</span> <kbd>Esc</kbd> hides</p>
+      </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@eburlak/tooltip@0.3.2"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>

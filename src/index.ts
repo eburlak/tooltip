@@ -48,6 +48,16 @@ const getAnchor = (target: EventTarget | null) =>
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
+const removeSiblings = (element: Element) =>
+  Array.from(element.parentElement?.children ?? []).forEach((child) => child !== element && child.remove());
+
+const getRemainingTime = (element: Element | null) => {
+  const [animation] = element?.getAnimations?.() ?? [];
+  const { endTime = 0, localTime = 0 } = animation?.effect?.getComputedTiming() ?? {};
+
+  return Math.max(Number(endTime) - Number(localTime), 0);
+};
+
 const getId = () => `tooltip-${Math.random().toString(36).slice(2, 10)}`;
 
 export class Tooltip {
@@ -252,21 +262,38 @@ export class Tooltip {
     const previousContent = isSwitching ? (element.lastElementChild as HTMLElement | null) : null;
     const content = previousContent?.textContent === text ? previousContent : document.createElement('span');
 
-    if (content === previousContent) {
+    if (!previousContent) {
       element.replaceChildren(content);
-    } else {
-      previousContent?.setAttribute('data-leaving', '');
-      previousContent?.setAttribute('aria-hidden', 'true');
-      content.textContent = text;
-      element.replaceChildren(...(previousContent ? [previousContent] : []), content);
+    } else if (content !== previousContent) {
+      const { opacity } = getComputedStyle(previousContent);
+      const isWaitingForLeaving = opacity === '0';
+
+      if (isWaitingForLeaving) {
+        previousContent.remove();
+        content.style.animationDelay = `${getRemainingTime(element.lastElementChild)}ms`;
+      } else {
+        const leavingTime = `${(this.options.theme.duration / 2) * Number(opacity)}ms`;
+
+        removeSiblings(previousContent);
+        previousContent.style.opacity = opacity;
+        previousContent.style.animationDelay = '';
+        previousContent.style.animationDuration = leavingTime;
+        content.style.animationDelay = leavingTime;
+        previousContent.setAttribute('data-leaving', '');
+        previousContent.setAttribute('aria-hidden', 'true');
+      }
+
+      element.append(content);
     }
+
+    content.textContent = text;
 
     content.style.width = '';
     element.style.width = '';
     element.style.height = '';
     element.style.maxWidth = '';
     const { width, height } = element.getBoundingClientRect();
-    content.style.width = `${Math.ceil(content.getBoundingClientRect().width)}px`;
+    content.style.width = `${Math.ceil(parseFloat(getComputedStyle(content).width))}px`;
 
     return { width: Math.ceil(width), height: Math.ceil(height) };
   }

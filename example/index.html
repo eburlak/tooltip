@@ -3,14 +3,14 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>@eburlak/tooltip - one tooltip that glides between anchors</title>
+    <title>@eburlak/tooltip - one tooltip that travels between anchors</title>
     <meta
       name="description"
-      content="Accessible, zero-dependency tooltip for React and vanilla JS. One shared element glides between anchors, data-tooltip attributes, runtime themes, about 2.3 kB gzipped."
+      content="Accessible, zero-dependency tooltip for React and vanilla JS. One shared element travels between anchors, data-tooltip attributes, runtime themes, about 2.3 kB gzipped."
     />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="@eburlak/tooltip" />
-    <meta property="og:description" content="One tooltip that glides between every anchor. Accessible, zero dependencies, React and plain HTML." />
+    <meta property="og:description" content="One tooltip that travels between every anchor. Accessible, zero dependencies, React and plain HTML." />
     <meta property="og:url" content="https://eburlak.github.io/tooltip/" />
     <meta property="og:image" content="https://eburlak.github.io/tooltip/og.png" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -418,7 +418,7 @@
         <div class="hero">
           <h1>One tooltip. It travels.</h1>
           <p class="lead">
-            Every anchor on this page shares a single element. It glides to the next one and morphs its size
+            Every anchor on this page shares a single element. It travels to the next one and morphs its size
             and text on the way. Hover the keyboard, press Tab, or just start typing.
           </p>
 
@@ -775,7 +775,7 @@
         button.type = 'button';
         button.className = 'button';
         button.textContent = `New ${addedState.count}`;
-        button.dataset.tooltip = 'Added after the tooltip was created, works right away';
+        button.dataset.tooltip = `Added after the tooltip was created, works right away #${addedState.count}`;
         event.currentTarget.before(button);
       });
 

@@ -51,12 +51,12 @@ export const getCss = (id: string, theme: ITheme) => `
 }
 
 #${id} > span[data-leaving] + span {
-  animation: ${id}-text-in ${theme.duration}ms ease-out;
+  animation: ${id}-text-in ${theme.duration / 2}ms ${theme.duration / 2}ms ease-out backwards;
 }
 
 #${id} > span[data-leaving] {
   position: absolute;
-  animation: ${id}-text-out ${theme.duration / 2}ms ease-out forwards;
+  animation: ${id}-text-out ${theme.duration / 2}ms ease-in forwards;
 }
 
 @keyframes ${id}-text-in {
